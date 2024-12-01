@@ -1,3 +1,9 @@
+# Buck2
+/buck-out
+/compile_commands.json
+/install
+/.cache
+
 # Prerequisites
 *.d
 
