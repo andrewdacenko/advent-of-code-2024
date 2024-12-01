@@ -6,7 +6,13 @@
 #include <string>
 #include <unistd.h>
 
+enum Lookup {
+  Diff,
+  Similarity,
+};
+
 struct Config {
+  Lookup lookup{Lookup::Diff};
   locations::LocationsLists locations;
 };
 
@@ -22,9 +28,13 @@ void printHelp(const char *progname) {
 int main(int argc, char **argv) {
   Config config;
   for (;;) {
-    switch (getopt(argc, argv, "hi:")) {
+    switch (getopt(argc, argv, "hsi:")) {
     case 'i':
       config.locations = locations::getLocations(optarg);
+      continue;
+
+    case 's':
+      config.lookup = Lookup::Similarity;
       continue;
 
     case '?':
@@ -40,9 +50,12 @@ int main(int argc, char **argv) {
     break;
   }
 
-  auto diff = locations::compareLocations(config.locations);
+  auto result = config.lookup == Lookup::Diff
+                    ? locations::compareLocations(config.locations)
+                    : locations::computeSimilarity(config.locations);
 
-  printf("Differences: %d\n", diff);
+  printf("%s: %d\n",
+         config.lookup == Lookup::Diff ? "Differences" : "Similarity", result);
 
   return 0;
 }

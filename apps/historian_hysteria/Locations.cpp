@@ -8,6 +8,7 @@
 #include <regex>
 #include <stdexcept>
 #include <stdio.h>
+#include <unordered_map>
 
 namespace {
 std::regex PATTERN(R"(\b(\d+)\s+(\d+)\b)");
@@ -30,6 +31,19 @@ const int compareLocations(const LocationsLists &lists) {
     diff += distance;
   }
   return diff;
+}
+
+const int computeSimilarity(const LocationsLists &lists) {
+  std::unordered_map<int, int> counts;
+  for (int num : lists.second) {
+    counts[num]++;
+  }
+
+  int similarity = 0;
+  for (int num : lists.first) {
+    similarity += counts[num] * num;
+  }
+  return similarity;
 }
 
 const LocationsLists getLocations(const std::string &filePath) {
