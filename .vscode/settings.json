@@ -1,4 +1,5 @@
 {
   "C_Cpp.intelliSenseEngine": "disabled",
-  "search.followSymlinks": false
+  "search.followSymlinks": false,
+  "clangd.fallbackFlags": ["-std=c++2b"]
 }
