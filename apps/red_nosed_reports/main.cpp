@@ -14,7 +14,7 @@ void printHelp(const char *progname) {
   fprintf(stderr, "Usage: [OPTION]...\n"
                   "Example: -h\n"
                   "\n"
-                  "  -i        Input file path. Required\n"
+                  "  -i        Input file path [Required]\n"
                   "  -h        Print out this help\n"
                   "\n");
 }
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   }
 
   if (config.inputFile.empty()) {
-    printf("Missing mandatory input file\n");
+    printf("Missing required input file path.\n");
     printHelp(argv[0]);
     return -1;
   }

@@ -1,5 +1,5 @@
 cxx_binary(
-    name = "part1",
+    name = "main",
     srcs = glob(["*.cpp"]),
     headers = glob(["*.hpp"]),
     compiler_flags = ["-std=c++2b"],
