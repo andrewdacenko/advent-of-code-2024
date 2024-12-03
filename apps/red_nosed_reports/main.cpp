@@ -3,7 +3,10 @@
 #include <cstdio>
 #include <unistd.h>
 
+using namespace reports;
+
 struct Config {
+  DumpenerMode mode;
   std::string inputFile;
 };
 
@@ -19,9 +22,12 @@ void printHelp(const char *progname) {
 int main(int argc, char **argv) {
   Config config;
   for (;;) {
-    switch (getopt(argc, argv, "hi:")) {
+    switch (getopt(argc, argv, "hdi:")) {
     case 'i':
       config.inputFile = optarg;
+      continue;
+    case 'd':
+      config.mode = DumpenerMode::ON;
       continue;
 
     case '?':
@@ -44,7 +50,7 @@ int main(int argc, char **argv) {
   }
 
   const auto result =
-      reports::countSafeReports(reports::getReports(config.inputFile));
+      countSafeReports(getReports(config.inputFile), config.mode);
   printf("Number of safe reports: %d\n", result);
   return 0;
 }

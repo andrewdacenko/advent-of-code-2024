@@ -39,33 +39,70 @@ const Reports getReports(const std::string &filePath) {
   return reports;
 }
 
-const int countSafeReports(const Reports &reports) {
+int countSafeReports(const Reports &reports, DumpenerMode mode) {
   int count = 0;
-  for (const auto &report : reports) {
-    int safe = true;
-    int direction =
-        report[0] > report[1] ? Direction::DECREASING : Direction::INCREASING;
-    for (int i = 0; i < report.size() - 1; ++i) {
-      int nextDirection = report[i] > report[i + 1] ? Direction::DECREASING
-                                                    : Direction::INCREASING;
-      if (direction != nextDirection) {
-        safe = false;
-        break;
-      }
-
-      int diff = std::abs(report[i] - report[i + 1]);
-      if (diff < 1 || diff > 3) {
-        safe = false;
-        break;
+  if (mode == DumpenerMode::OFF) {
+    for (const auto &report : reports) {
+      if (getSafetyViolationIndex(report) == -1) {
+        ++count;
       }
     }
 
-    if (safe) {
+    return count;
+  }
+
+  for (const auto &report : reports) {
+    if (isReportSafeWithDampener(report)) {
       ++count;
     }
   }
 
   return count;
+}
+
+int getSafetyViolationIndex(const Report &report) {
+  int index = -1;
+  int direction =
+      report[0] > report[1] ? Direction::DECREASING : Direction::INCREASING;
+  for (int i = 0; i < report.size() - 1; ++i) {
+    int nextDirection = report[i] > report[i + 1] ? Direction::DECREASING
+                                                  : Direction::INCREASING;
+    if (direction != nextDirection) {
+      index = i;
+      break;
+    }
+
+    int diff = std::abs(report[i] - report[i + 1]);
+    if (diff < 1 || diff > 3) {
+      index = i;
+      break;
+    }
+  }
+
+  return index;
+}
+
+bool isReportSafeWithDampener(const Report &report) {
+  int safetyViolationIndex = getSafetyViolationIndex(report);
+  if (getSafetyViolationIndex(report) == -1) {
+    return true;
+  }
+
+  for (int i = 0; i < 3; i++) {
+    std::vector<int> dumpenedReport;
+    int index = safetyViolationIndex + i;
+    dumpenedReport.reserve(report.size() - 1);
+    dumpenedReport.insert(dumpenedReport.end(), report.begin(),
+                          report.begin() + index);
+    dumpenedReport.insert(dumpenedReport.end(), report.begin() + index + 1,
+                          report.end());
+
+    if (getSafetyViolationIndex(dumpenedReport) == -1) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 } // namespace reports
