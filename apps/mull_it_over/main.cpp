@@ -4,6 +4,7 @@
 
 struct Config {
   std::string inputFile;
+  mult::MultMode mode{mult::MultMode::MULT_IT_OVER};
 };
 
 void printHelp(const char *progname) {
@@ -18,9 +19,12 @@ void printHelp(const char *progname) {
 int main(int argc, char **argv) {
   Config config;
   for (;;) {
-    switch (getopt(argc, argv, "hi:")) {
+    switch (getopt(argc, argv, "hdi:")) {
     case 'i':
       config.inputFile = optarg;
+      continue;
+    case 'd':
+      config.mode = mult::MultMode::ON_OFF;
       continue;
 
     case '?':
@@ -42,7 +46,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  auto result = mult::calculate(mult::parseInstructions(config.inputFile));
+  auto result =
+      mult::calculate(mult::parseInstructions(config.inputFile, config.mode));
   printf("Mult: %d\n", result);
 
   return 0;
