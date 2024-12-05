@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace search {
 struct Pos {
@@ -11,5 +11,6 @@ struct Pos {
   int nextIndex;
 };
 std::vector<std::string> readFileLines(const std::string &filename);
-int countWords(const std::vector<std::string>& lines);
+int countWords(const std::vector<std::string> &lines);
+int countCrossWords(const std::vector<std::string> &lines);
 } // namespace search

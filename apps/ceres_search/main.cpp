@@ -4,6 +4,7 @@
 
 struct Config {
   std::string inputFile;
+  bool x{false};
 };
 
 void printHelp(const char *progname) {
@@ -18,10 +19,12 @@ void printHelp(const char *progname) {
 int main(int argc, char **argv) {
   Config config;
   for (;;) {
-    switch (getopt(argc, argv, "hi:")) {
+    switch (getopt(argc, argv, "hxi:")) {
     case 'i':
       config.inputFile = optarg;
       continue;
+    case 'x':
+      config.x = true;
       continue;
 
     case '?':
@@ -43,8 +46,10 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  auto result = search::countWords(search::readFileLines(config.inputFile));
-  printf("XMAS count: %d\n", result);
+  auto lines = search::readFileLines(config.inputFile);
+  auto result =
+      config.x ? search::countCrossWords(lines) : search::countWords(lines);
+  printf("X%sMAS count: %d\n", config.x ? "-" : "", result);
 
   return 0;
 }

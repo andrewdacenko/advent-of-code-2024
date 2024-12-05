@@ -84,4 +84,40 @@ int countWords(const std::vector<std::string> &lines) {
 
   return s.size();
 }
+
+int countCrossWords(const std::vector<std::string> &lines) {
+  int count = 0;
+  int rows = lines.size();
+  int columns = lines[0].size();
+
+  auto isValidXMAS = [&lines](int row, int col) {
+    char tl = lines[row - 1][col - 1];
+    char tr = lines[row - 1][col + 1];
+    char bl = lines[row + 1][col - 1];
+    char br = lines[row + 1][col + 1];
+
+    char c[4] = {tl, tr, bl, br};
+    for (auto ch : c) {
+      if (ch != 'M' && ch != 'S') {
+        return false;
+      }
+    }
+
+    if (tl == br || tr == bl) {
+      return false;
+    }
+
+    return true;
+  };
+
+  for (int row = 1; row < rows - 1; ++row) {
+    for (int col = 1; col < columns - 1; ++col) {
+      if (lines[row][col] == 'A' && isValidXMAS(row, col)) {
+        count++;
+      }
+    }
+  }
+
+  return count;
+}
 } // namespace search
