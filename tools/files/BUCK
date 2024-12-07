@@ -1,0 +1,10 @@
+cxx_library(
+    name = "files",
+    compiler_flags = ["-std=c++2b"],
+    srcs = glob(["*.cpp"]),
+    exported_headers = glob([
+        "*.hpp",
+    ]),
+    header_namespace = "files",
+    visibility = ["PUBLIC"],
+)
