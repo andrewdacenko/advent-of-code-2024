@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   }
 
   auto data = files::getLines(options.inputFileName);
-  auto res = options.second ? 0 : calibration::countCalibrations(data);
+  auto res = calibration::countCalibrations(data, options.second);
   printf("Sum: %llu\n", res);
 
   return 0;
