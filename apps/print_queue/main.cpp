@@ -10,8 +10,11 @@ int main(int argc, char **argv) {
     return code;
   }
 
-  auto res = updates::parseRulesAndUpdates(files::getLines(options.inputFileName));
-  printf("Sum: %d\n", updates::countValidUpdates(res.first, res.second));
+  auto res =
+      updates::parseRulesAndUpdates(files::getLines(options.inputFileName));
+  printf("Sum: %d\n", options.second
+                          ? updates::countInvalidUpdates(res.first, res.second)
+                          : updates::countValidUpdates(res.first, res.second));
 
   return 0;
 }
