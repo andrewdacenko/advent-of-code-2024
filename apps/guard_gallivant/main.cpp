@@ -10,7 +10,8 @@ int main(int argc, char **argv) {
     return code;
   }
 
-  auto res = path::countMoves(files::getLines(options.inputFileName));
+  auto grid = files::getLines(options.inputFileName);
+  auto res = options.second ? path::countLoops(grid) : path::countMoves(grid);
   printf("Sum: %d\n", res);
 
   return 0;
