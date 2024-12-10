@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   }
 
   auto data = files::getLines(options.inputFileName);
-  auto res = frequency::countAntinodes(data);
+  auto res = frequency::countAntinodes(data, options.second);
   printf("Count: %d\n", res);
 
   return 0;

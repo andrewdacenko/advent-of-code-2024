@@ -4,15 +4,9 @@
 #include <cstdio>
 #include <iterator>
 #include <numeric>
-#include <unordered_set>
 #include <vector>
 
 namespace frequency {
-struct PairHash {
-  size_t operator()(const std::pair<int, int> &p) const {
-    return std::hash<int>{}(p.first) ^ std::hash<int>{}(p.second);
-  }
-};
 
 NodesMap findNodesMap(const Grid &grid) {
   NodesMap nodesMap{};
@@ -44,7 +38,7 @@ std::vector<PosPair> combinations(const std::vector<Pos> &nodes) {
   return result;
 }
 
-int countAntinodes(const Grid &grid) {
+int countAntinodes(const Grid &grid, bool second) {
   auto nodesMap = findNodesMap(grid);
   auto pairs = std::accumulate(std::begin(nodesMap), std::end(nodesMap),
                                std::vector<PosPair>{},
@@ -58,32 +52,53 @@ int countAntinodes(const Grid &grid) {
            pos.second < grid[0].size();
   };
 
-  auto genAntinodes = [&inbounds](const PosPair &pair) {
+  int lim = second ? grid.size() : 1;
+
+  auto genAntinodes = [lim, &inbounds](const PosPair &pair) {
     std::vector<Pos> res;
 
     auto [left, right] = pair;
-    if (auto first =
-            Pos{2 * left.first - right.first, 2 * left.second - right.second};
-        inbounds(first)) {
-      res.push_back(first);
-    };
+    for (int i = 1; i <= lim; i++) {
+      if (auto pos = Pos{left.first - i * (right.first - left.first),
+                         left.second - i * (right.second - left.second)};
+          inbounds(pos)) {
+        res.push_back(pos);
+      } else {
+        break;
+      }
+    }
 
-    if (auto second =
-            Pos{2 * right.first - left.first, 2 * right.second - left.second};
-        inbounds(second)) {
-      res.push_back(second);
+    for (int i = 1; i <= lim; i++) {
+      if (auto second = Pos{right.first - i * (left.first - right.first),
+                            right.second - i * (left.second - right.second)};
+          inbounds(second)) {
+        res.push_back(second);
+      }
     }
 
     return res;
   };
 
-  auto antinodes = std::accumulate(
-      pairs.begin(), pairs.end(), std::unordered_set<Pos, PairHash>{},
+  auto accAntinodes = [&genAntinodes](const std::vector<PosPair>& pairs) {
+    return std::accumulate(
+      pairs.begin(), pairs.end(), UniquePositions{},
       [&genAntinodes](auto acc, const PosPair &pair) {
         auto nodes = genAntinodes(pair);
         std::copy(nodes.begin(), nodes.end(), std::inserter(acc, acc.end()));
         return acc;
       });
+  };
+
+  auto antinodes = accAntinodes(pairs);
+
+  if (second) {
+    auto antinodePairs = combinations({antinodes.begin(), antinodes.end()});
+    for (auto node: accAntinodes(antinodePairs)) {
+      if (grid[node.first][node.second] != '.') {
+        antinodes.insert(node);
+      }
+    }
+  }
 
   return antinodes.size();
 }
