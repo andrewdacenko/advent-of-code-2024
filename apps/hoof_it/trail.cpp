@@ -36,7 +36,7 @@ int countTrails(const std::vector<std::string> &grid, bool second) {
         }
 
         newTop.val = grid[newTop.row][newTop.col] - '0';
-        if (visited.contains(newTop)) {
+        if (visited.contains(newTop) && !second) {
           continue;
         }
 
