@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
   }
 
   auto data = files::getContent(options.inputFileName);
-  auto res = blink::countStones(data, 25, options.second);
+  auto res = blink::countStones(data, options.second);
   std::println("Stones: {}", res);
 
   return 0;
