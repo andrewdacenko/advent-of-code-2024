@@ -1,5 +1,6 @@
 #include "fences.hpp"
 
+#include <functional>
 #include <iterator>
 #include <numeric>
 #include <print>
@@ -40,7 +41,73 @@ struct Region {
         });
   };
 
-  int price() const { return points.size() * perimeter(); }
+  int walls() const {
+    int top, bottom = points.begin()->first;
+    int left, right = points.begin()->second;
+
+    for (auto p : points) {
+      top = std::min(top, p.first);
+      bottom = std::max(bottom, p.first);
+      left = std::min(left, p.second);
+      right = std::max(right, p.second);
+    }
+
+    int topWalls = wallsCount(
+        top, bottom, (int[3]){1, -1, 0}, [](const Pos &p) { return p.first; },
+        [](const Pos &a, const Pos &b) { return a.second < b.second; },
+        [](const Pos &a, const Pos &b) { return a.second - b.second; });
+    int bottomWalls = wallsCount(
+        bottom, top, (int[3]){-1, 1, 0}, [](const Pos &p) { return p.first; },
+        [](const Pos &a, const Pos &b) { return a.second < b.second; },
+        [](const Pos &a, const Pos &b) { return a.second - b.second; });
+    int leftWalls = wallsCount(
+        left, right, (int[3]){1, 0, -1}, [](const Pos &p) { return p.second; },
+        [](const Pos &a, const Pos &b) { return a.first < b.first; },
+        [](const Pos &a, const Pos &b) { return a.first - b.first; });
+    int rightWalls = wallsCount(
+        right, left, (int[3]){-1, 0, 1}, [](const Pos &p) { return p.second; },
+        [](const Pos &a, const Pos &b) { return a.first < b.first; },
+        [](const Pos &a, const Pos &b) { return a.first - b.first; });
+
+    return topWalls + bottomWalls + leftWalls + rightWalls;
+  };
+
+  int wallsCount(int from, int to, int delta[3],
+                 std::function<int(const Pos &)> accessor,
+                 std::function<bool(const Pos &, const Pos &)> sort,
+                 std::function<int(const Pos &, const Pos &)> diff) const {
+    int count = 0;
+    for (int i = from; i != to + delta[0]; i += delta[0]) {
+      std::vector<Pos> line;
+      for (auto p : points) {
+        if (accessor(p) == i &&
+            !points.contains({p.first + delta[1], p.second + delta[2]})) {
+          line.push_back(p);
+        }
+      }
+
+      if (line.size() == 0) {
+        continue;
+      }
+
+      std::sort(line.begin(), line.end(), sort);
+
+      int splits = 1;
+      for (int j = 0; j < line.size() - 1; j++) {
+        if (diff(line[j + 1], line[j]) != 1) {
+          splits++;
+        }
+      }
+
+      count += splits;
+    }
+
+    return count;
+  }
+
+  int price(bool second) const {
+    return points.size() * (second ? walls() : perimeter());
+  }
 };
 
 int countFences(const std::vector<std::string> &grid, bool second) {
@@ -91,6 +158,6 @@ int countFences(const std::vector<std::string> &grid, bool second) {
 
   return std::accumulate(
       regions.begin(), regions.end(), 0,
-      [](auto acc, auto region) { return acc + region.price(); });
+      [second](auto acc, auto region) { return acc + region.price(second); });
 }
 } // namespace fences
