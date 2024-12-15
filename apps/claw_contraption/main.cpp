@@ -1,9 +1,8 @@
 #include "arcade.hpp"
 
-#include <cstdio>
 #include <files/files.hpp>
+#include <print>
 #include <program_options/program_options.hpp>
-#include <string>
 
 int main(int argc, char **argv) {
   program_options::Options options;
@@ -13,7 +12,7 @@ int main(int argc, char **argv) {
 
   auto data = files::getLines(options.inputFileName);
   auto res = arcade::countTokens(data, options.second);
-  printf("Count: %d\n", res);
+  std::println("Count: {}", res);
 
   return 0;
 }
