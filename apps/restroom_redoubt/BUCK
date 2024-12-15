@@ -1,0 +1,11 @@
+cxx_binary(
+    name = "main",
+    srcs = glob(["*.cpp"]),
+    headers = glob(["*.hpp"]),
+    compiler_flags = ["-std=c++2b"],
+    link_style = "static",
+    deps = [
+        "//tools/files:files",
+        "//tools/program_options:program_options",
+    ],
+)
