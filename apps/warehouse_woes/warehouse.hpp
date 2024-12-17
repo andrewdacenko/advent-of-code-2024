@@ -20,6 +20,7 @@ public:
 
   int row;
   int col;
+  int width{1};
 
   bool operator==(const Pos &p) const { return row == p.row && col == p.col; }
 };
@@ -36,16 +37,17 @@ private:
   const static inline std::unordered_map<char, std::tuple<int, int>> dirs{
       {'^', {-1, 0}}, {'v', {1, 0}}, {'<', {0, -1}}, {'>', {0, 1}}};
 
-  bool second_;
+  int scale;
   int rows_, cols_ = 0;
   std::string moves_;
   Pos robot_;
   std::unordered_set<Pos, Pos::Hash> boxes_;
   std::unordered_set<Pos, Pos::Hash> walls_;
 
-  std::optional<Pos> nextEmptyPos(char move) const;
+  bool canMove(const Pos &pos, char move) const;
   void printWarehouse() const;
-  
+  std::vector<Pos> getHorizontalBoxes(const Pos &pos, char dir);
+
   template <class... _Args>
   void print(std::format_string<_Args...> __fmt, _Args &&...__args) const;
 };
